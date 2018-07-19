@@ -5,9 +5,11 @@
       "semicolon": [true, "never"],
       "trailing-comma": [true, "multiline"],
       "arrow-parens": [true, "ban-single-arg-parens"],
+      "ter-arrow-parens": [true, "as-needed"],
       "indent": [true, "spaces", 2],
       "only-arrow-functions": true,
       "no-irregular-whitespace": true,
-      "no-unused-expressions": false
+      "no-unused-expressions": false,
+      "max-line-length": false
     }
 }

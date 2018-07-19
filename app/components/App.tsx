@@ -1,81 +1,52 @@
 import * as React from "react"
-import { Button, StyleSheet, Text, View } from "react-native"
+import { StyleSheet, Text, View } from "react-native"
+
+import { auth, fs, notifications, messaging } from "../modules/Firebase"
+import Notifications from "../modules/Notifications"
 
 export interface Props {
-  name: string
-  enthusiasmLevel?: number
 }
 
 interface State {
-  enthusiasmLevel: number
+  loggedIn: boolean
 }
 
 export default class App extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
+  state = { loggedIn: false }
 
-    this.state = {
-      enthusiasmLevel: props.enthusiasmLevel || 1,
-    }
+  async componentDidMount() {
+    Notifications.init()
+
+    auth().onAuthStateChanged((user: any) => {
+      this.setState({ loggedIn: !!user })
+    })
+
+    auth().signInAnonymouslyAndRetrieveData()
+      .then(() => console.log("Signed in"))
+      .catch(err => console.log("Failed to sign in: ", err))
   }
 
-  onIncrement = () =>
-    this.setState({ enthusiasmLevel: this.state.enthusiasmLevel + 1 })
-  onDecrement = () =>
-    this.setState({ enthusiasmLevel: this.state.enthusiasmLevel - 1 })
-  getExclamationMarks = (numChars: number) => Array(numChars + 1).join("!")
+  componentWillUnmount() {
+    Notifications.unmount()
+  }
 
   render() {
     return (
-      <View style={styles.root}>
-        <Text style={styles.greeting}>
-          {"Hello " + this.props.name + this.getExclamationMarks(this.state.enthusiasmLevel)}
-        </Text>
-
-        <View style={styles.buttons}>
-          <View style={styles.button}>
-            <Button
-              title="-"
-              onPress={this.onDecrement}
-              accessibilityLabel="decrement"
-              color="red"
-            />
-          </View>
-
-          <View style={styles.button}>
-            <Button
-              title="+"
-              onPress={this.onIncrement}
-              accessibilityLabel="increment"
-              color="blue"
-            />
-          </View>
-        </View>
+      <View style={styles.container}>
+        {this.state.loggedIn ? (
+          <Text>{auth().currentUser!.uid}</Text>
+        ) : (
+          <Text>Hello world</Text>
+        )}
       </View>
     )
   }
 }
 
-// styles
 const styles = StyleSheet.create({
-  root: {
+  container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  buttons: {
-    flexDirection: "row",
-    minHeight: 70,
-    alignItems: "stretch",
-    alignSelf: "center",
-    borderWidth: 5,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 0,
-  },
-  greeting: {
-    color: "#999",
-    fontWeight: "bold",
   },
 })

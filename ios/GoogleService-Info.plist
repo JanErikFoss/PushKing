@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>385624527862-8703fsv8l0alsobj8v465bn5t9q2n2pc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.385624527862-8703fsv8l0alsobj8v465bn5t9q2n2pc</string>
+	<key>API_KEY</key>
+	<string>AIzaSyArnFQ6x7v6Ot6oHhviBDQmuoD0IUQTMBU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>385624527862</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.pushking</string>
+	<key>PROJECT_ID</key>
+	<string>pushking-36232</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pushking-36232.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:385624527862:ios:c40ee02f8fc6caf1</string>
+	<key>DATABASE_URL</key>
+	<string>https://pushking-36232.firebaseio.com</string>
+</dict>
+</plist>
