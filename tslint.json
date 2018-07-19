@@ -1,0 +1,13 @@
+{
+    "extends": ["tslint-config-airbnb"],
+    "rules": {
+      "quotemark": [true, "double", "jsx-double", "avoid-escape"],
+      "semicolon": [true, "never"],
+      "trailing-comma": [true, "multiline"],
+      "arrow-parens": [true, "ban-single-arg-parens"],
+      "indent": [true, "spaces", 2],
+      "only-arrow-functions": true,
+      "no-irregular-whitespace": true,
+      "no-unused-expressions": false
+    }
+}
