@@ -1,7 +1,9 @@
 import * as React from "react"
 import { StyleSheet, Text, View } from "react-native"
 
-import { auth, fs, notifications, messaging } from "../modules/Firebase"
+import Main from "./Main"
+
+import { auth, fs } from "../modules/Firebase"
 import Notifications from "../modules/Notifications"
 
 export interface Props {
@@ -17,12 +19,9 @@ export default class App extends React.Component<Props, State> {
   async componentDidMount() {
     Notifications.init()
 
-    auth().onAuthStateChanged((user: any) => {
-      this.setState({ loggedIn: !!user })
-    })
-
+    auth().onAuthStateChanged((user: any) => this.setState({ loggedIn: !!user }))
     auth().signInAnonymouslyAndRetrieveData()
-      .then(() => console.log("Signed in"))
+      .then(res => console.log("Logged in, uid: ", res.user.uid))
       .catch(err => console.log("Failed to sign in: ", err))
   }
 
@@ -34,9 +33,9 @@ export default class App extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         {this.state.loggedIn ? (
-          <Text>{auth().currentUser!.uid}</Text>
+          <Main />
         ) : (
-          <Text>Hello world</Text>
+          <Text>Signing in...</Text>
         )}
       </View>
     )

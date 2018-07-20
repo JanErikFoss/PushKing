@@ -1,5 +1,5 @@
 
-import { auth, fs, notifications, messaging } from "../modules/Firebase"
+import { auth, fs, notifications, messaging } from "./Firebase"
 
 interface UserData {
   fcmTokens: {
