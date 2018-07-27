@@ -10,6 +10,7 @@
       "only-arrow-functions": true,
       "no-irregular-whitespace": true,
       "no-unused-expressions": false,
+      "no-increment-decrement": false,
       "max-line-length": false
     }
 }

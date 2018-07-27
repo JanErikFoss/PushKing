@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { StyleSheet, Text, View, YellowBox } from "react-native"
 
 import Main from "./Main"
 
@@ -17,6 +17,10 @@ export default class App extends React.Component<Props, State> {
   state = { loggedIn: false }
 
   async componentDidMount() {
+    YellowBox.ignoreWarnings([
+      "Remote debugger is in a background tab",
+    ])
+
     Notifications.init()
 
     auth().onAuthStateChanged((user: any) => this.setState({ loggedIn: !!user }))

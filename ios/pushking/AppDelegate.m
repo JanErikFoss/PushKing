@@ -19,8 +19,8 @@
   [FIRApp configure];
   
   NSURL *jsCodeLocation;
-  // jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-  jsCodeLocation = [NSURL URLWithString:@"http://192.168.0.103:8081/index.bundle?platform=ios&dev=true"];
+  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  // jsCodeLocation = [NSURL URLWithString:@"http://192.168.0.103:8081/index.bundle?platform=ios&dev=true"];
   
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"pushking"
