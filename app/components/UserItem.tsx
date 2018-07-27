@@ -5,27 +5,13 @@ import { connect } from "react-redux"
 
 import ListItem from "./ListItem"
 
-interface User {
-  uid: string,
-  nickname: string,
-  cash: number,
-  level: number,
-}
-
-interface Attack {
-  attacker: string,
-  defender: string,
-  state: string,
-  defended: boolean,
-  timestamp: Date,
-  finishTime: Date,
-}
+import * as T from "../types"
 
 interface Props {
   uid: string,
-  user: User,
-  incomingAttack?: Attack,
-  outgoingAttack?: Attack,
+  user: T.User,
+  incomingAttack?: T.Attack,
+  outgoingAttack?: T.Attack,
   onPress: (uid: string) => void,
 }
 

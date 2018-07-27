@@ -1,7 +1,7 @@
 import {
   setIncomingAttack,
   setOutgoingAttack,
-} from "../actions/"
+} from "../actions"
 
 const defaultState = {
   incoming: {},

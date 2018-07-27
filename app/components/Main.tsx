@@ -4,26 +4,30 @@ import { StyleSheet, Text, View, Alert, Dimensions, Platform, TextInput, StatusB
 import { connect } from "react-redux"
 import { setUser, setIncomingAttack, setOutgoingAttack } from "../actions"
 
+import * as T from "../types"
+
 import List from "./List"
 
 import { auth, fs, functions } from "../modules/Firebase"
 const attack = functions().httpsCallable("attack")
 
 export interface Props {
-  user: Object,
-  users: Object[],
+  user: T.User,
+  users: T.User[],
+  attacks: { [uid: string]: T.Attack },
   setUser: (uid: string, user: Object) => void,
   setIncomingAttack: (attack: Object) => void,
   setOutgoingAttack: (attack: Object) => void,
 }
 
 interface State {
+  nickname: string,
 }
 
 const NICKNAME_UPDATE_DELAY = 1 * 1000
 
 class MainComponent extends React.Component<Props, State> {
-  state = {}
+  state = { nickname: "" }
   incomingAttackListener = null
   outgoingAttackListener = null
   usersListener = null
@@ -70,7 +74,7 @@ class MainComponent extends React.Component<Props, State> {
     })
   }
 
-  onAttack = doc => {
+  getAttackObj = doc => {
     const data = doc.exists && doc.data()
     if (!data) return console.log("Attack doc has been deleted")
     if (!data.defender || !data.attacker) return console.log("Missing attack data")
@@ -78,13 +82,13 @@ class MainComponent extends React.Component<Props, State> {
   }
 
   onIncomingAttack = doc => {
-    const attackObj = this.onAttack(doc)
+    const attackObj = this.getAttackObj(doc)
     console.log("Incoming attack: ", attackObj)
     this.props.setIncomingAttack(attackObj)
   }
 
   onOutgoingAttack = doc => {
-    const attackObj = this.onAttack(doc)
+    const attackObj = this.getAttackObj(doc)
     console.log("Outgoing attack: ", attackObj)
     this.props.setOutgoingAttack(attackObj)
   }
@@ -105,6 +109,26 @@ class MainComponent extends React.Component<Props, State> {
     .then(() => console.log("User data updated"))
     .catch(err => console.log("Failed to update user data"))
 
+  onPress = (uid: string) => {
+    const incoming = this.props.attacks.incoming[uid]
+    if (incoming) return this.defend(incoming)
+
+    const outgoing = this.props.attacks.outgoing[uid]
+    if (outgoing) return Alert.alert("Already attacking", "You are already attacking this person")
+    return this.attack(uid)
+  }
+
+  defend = (attack: T.Attack): void => {
+    console.log("Defending attack: ", attack)
+
+    fs().doc("attacks/" + attack.attackId).update({ defended: true, state: "finished" })
+      .then(() => console.log("Successfully defended"))
+      .catch(err => {
+        console.log("Failed to defend against attack: ", err)
+        Alert.alert("Something went wrong", err.message)
+      })
+  }
+
   attack = (uid: string): void => {
     console.log("Attacking user: ", uid)
 
@@ -119,17 +143,15 @@ class MainComponent extends React.Component<Props, State> {
   getRequiredCash = (level = 1) => {
     const nextLevel = level + 1
     let xp = 0
-
     for (let i = 1; i < nextLevel; i++) {
       xp += Math.floor(i + 300 * Math.pow(2, i / 7))
     }
-
     return Math.floor(xp / 4)
   }
 
   levelUp = () => {
     console.log("Leveling up")
-    const requiredCash = this.getRequiredCash(this.props.user)
+    const requiredCash = this.getRequiredCash(this.props.user.level)
     if (this.props.user.cash < requiredCash) return Alert.alert("Not enough cash")
 
     this.updateUserData({
@@ -174,6 +196,7 @@ class MainComponent extends React.Component<Props, State> {
 const mapStateToProps = (state, props) => ({
   user: state.users[auth().currentUser.uid] || {},
   users: state.users,
+  attacks: state.attacks,
 })
 const mapDispatchToProps = dispatch => ({
   setUser: (uid, user) => dispatch({ uid, payload: user, type: setUser }),

@@ -1,6 +1,6 @@
 import {
   setUser,
-} from "../actions/"
+} from "../actions"
 
 const defaultState = {}
 
