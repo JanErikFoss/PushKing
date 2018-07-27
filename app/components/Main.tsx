@@ -60,6 +60,10 @@ class MainComponent extends React.Component<Props, State> {
   onUsers = qss => {
     qss.docChanges.forEach(change => {
       const doc = change._document
+      if (doc.id === auth().currentUser.uid) {
+        this.setState({ nickname: doc.data().nickname })
+      }
+
       if (change.type === "modified") return this.props.setUser(doc.id, doc.data())
       if (change.type === "added") return this.props.setUser(doc.id, doc.data())
       if (change.tyoe === "removed") return this.props.setUser(doc.id, null)
@@ -92,6 +96,7 @@ class MainComponent extends React.Component<Props, State> {
   }
 
   onNicknameChange = nickname => {
+    this.setState({ nickname })
     this.nicknameUpdateTimeout && clearInterval(this.nicknameUpdateTimeout)
     this.nicknameUpdateTimeout = setTimeout(() => this.updateUserData({ nickname }), NICKNAME_UPDATE_DELAY)
   }
@@ -140,6 +145,7 @@ class MainComponent extends React.Component<Props, State> {
         <View style={styles.innerContainer}>
           <TextInput
             style={styles.nicknameInput}
+            value={this.state.nickname}
             placeholder="Set a nickname"
             onChangeText={this.onNicknameChange}
             allowFontScaling={false}
