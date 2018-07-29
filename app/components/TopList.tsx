@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser, attackUser } from "../modules/Actions"
+import { actionOnUser, attackUser, toggleFriend, reportUser } from "../modules/Actions"
 
 export interface Props {
   user: T.User,
@@ -72,7 +72,10 @@ class TopList extends React.Component<Props, State> {
   onActionSheetPressed = i => Object.values(this.actionSheetConfig)[i]()
   actionSheetConfig = {
     Cancel: () => {},
-    Attack: () => attackUser(this.asUid)
+    Attack: () => attackUser(this.asUid),
+    "Add friend": () => toggleFriend(this.asUid, true),
+    "Remove friend": () => toggleFriend(this.asUid, false),
+    "Report offensive name": () => reportUser(this.asUid, "offensive name"),
   }
 
   render() {

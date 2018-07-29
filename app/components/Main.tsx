@@ -82,15 +82,15 @@ class MainComponent extends React.Component<Props, State> {
             allowFontScaling={false}
             placeholderTextColor="silver"
           />
-          <Text style={styles.cashText}>{"Cash: " + (this.props.cash || 0)}</Text>
+          <Text style={styles.cashText}>{"Cash: " + (this.props.cash || 0).toLocaleString()}</Text>
           <MoreCashText level={(this.props.level || 1)} />
           <TouchableHighlight
             underlayColor="transparent"
             onPress={this.levelUp}
           >
             <View style={styles.levelUpButton}>
-              <Text style={styles.levelText}>{"Level " + (this.props.level || 1)}</Text>
-              <Text style={styles.levelUpText}>{"Level up for " + this.getRequiredCash(this.props.level) + " cash"}</Text>
+              <Text style={styles.levelText}>{"Level " + (this.props.level || 1).toLocaleString()}</Text>
+              <Text style={styles.levelUpText}>{"Level up for " + this.getRequiredCash(this.props.level).toLocaleString() + " cash"}</Text>
             </View>
           </TouchableHighlight>
         </View>

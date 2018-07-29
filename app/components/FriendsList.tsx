@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser, attackUser, toggleFriend, monitorUser } from "../modules/Actions"
+import { actionOnUser, attackUser, toggleFriend, monitorUser, reportUser } from "../modules/Actions"
 
 const DELAY = 1 * 500
 
@@ -72,6 +72,7 @@ class FriendsList extends React.Component<Props, State> {
     Attack: () => attackUser(this.asUid),
     "Add friend": () => toggleFriend(this.asUid, true),
     "Remove friend": () => toggleFriend(this.asUid, false),
+    "Report offensive name": () => reportUser(this.asUid, "offensive name"),
   }
 
   onTextChange = nickname => {

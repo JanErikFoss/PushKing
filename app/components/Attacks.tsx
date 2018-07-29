@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser, toggleFriend, monitorUser } from "../modules/Actions"
+import { actionOnUser, toggleFriend, monitorUser, reportUser } from "../modules/Actions"
 
 export interface Props {
   user: T.User,
@@ -114,6 +114,7 @@ class TopList extends React.Component<Props, State> {
     Cancel: () => {},
     "Add friend": () => toggleFriend(this.asUid, true),
     "Remove friend": () => toggleFriend(this.asUid, false),
+    "Report offensive name": () => reportUser(this.asUid, "offensive name"),
   }
 
   render() {

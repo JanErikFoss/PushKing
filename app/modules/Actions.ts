@@ -93,3 +93,18 @@ export const attackUser = async (uid: string) => {
     Alert.alert("Something went wrong", err.message)
   }
 }
+
+export const reportUser = async (uid: string, reason: string) => {
+  try {
+    console.log("Reporting user " + uid)
+    await fs().collection("reports").add({
+      reason,
+      reporter: auth().currentUser.uid,
+      reported: uid,
+    })
+    Alert.alert("Thank you", "Your report has been logged")
+  } catch (err) {
+    console.log("Failed to report user: ", err)
+    Alert.alert("Something went wrong", err.message)
+  }
+}

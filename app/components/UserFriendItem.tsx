@@ -36,8 +36,8 @@ export class UserFriendItemComponent extends React.Component<Props, State> {
         icon="person"
         headers={[
           this.props.user.nickname || "Mysterious figure",
-          "Cash: " + (this.props.user.cash || 0),
-          "Level: " + (this.props.user.level || 1),
+          "Cash: " + (this.props.user.cash || 0).toLocaleString(),
+          "Level: " + (this.props.user.level || 1).toLocaleString(),
         ]}
         isFriends={this.props.isFriends}
         onPress={this.onPress}

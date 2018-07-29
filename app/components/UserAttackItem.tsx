@@ -37,8 +37,8 @@ export class UserAttackItemComponent extends React.Component<Props, State> {
       icon="person"
       headers={[
         this.props.user.nickname || this.props.user.uid || "Mysterious user",
-        "Cash: " + (this.props.user.cash || 0),
-        "Level: " + (this.props.user.level || 1),
+        "Cash: " + (this.props.user.cash || 0).toLocaleString(),
+        "Level: " + (this.props.user.level || 1).toLocaleString(),
       ]}
       attackFinish={attackFinish}
       defendFinish={defendFinish}

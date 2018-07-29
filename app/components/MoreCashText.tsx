@@ -58,8 +58,9 @@ export default class MoreCashText extends React.Component<Props> {
     const text = getRemainingString(next) || "0 sec"
 
     const cash = this.props.level * this.cashPerLevelPerInterval
+    const cashText = cash.toLocaleString()
 
-    return <Text style={styles.text}>{"+" + cash + " in " + text}</Text>
+    return <Text style={styles.text}>{"+" + cashText + " in " + text}</Text>
   }
 }
 
