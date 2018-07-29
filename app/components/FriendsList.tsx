@@ -48,7 +48,7 @@ class FriendsList extends React.Component<Props, State> {
     this.listener && this.listener()
     this.listener = fs().collection("users")
       .where("nickname", ">=", this.state.nickname)
-      .limit(6)
+      .limit(10)
       .onSnapshot(this.onQss, err => console.log("Listener error: ", err))
   }
   onQss = qss => {
