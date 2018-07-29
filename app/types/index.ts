@@ -4,6 +4,7 @@ export interface User {
   nickname: string,
   cash: number,
   level: number,
+  friends: { [uid: string]: boolean },
 }
 
 export interface Attack {

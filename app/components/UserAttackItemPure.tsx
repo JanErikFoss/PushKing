@@ -15,6 +15,7 @@ interface Props {
   defendFinish?: Date,
 
   onPress?: Function,
+  onLongPress?: Function,
 }
 
 interface State {
@@ -36,8 +37,17 @@ export default class ListItem extends React.Component<Props, State> {
     return false
   }
 
-  getRemaining = remaining => {
-    const i = Math.ceil(remaining)
+  onLongPress = (x:any): boolean => {
+    this.props.onLongPress && this.props.onLongPress()
+    return false
+  }
+
+  getRemainingString = date => {
+    if (!date) return null
+    const remaining = (date.getTime() - Date.now()) / 1000
+    if (remaining < 1) return null
+
+    const i = Math.floor(remaining)
 
     if (i < 1) return "0s"
     if (i < 60) {
@@ -54,13 +64,6 @@ export default class ListItem extends React.Component<Props, State> {
     return hours + "h"
   }
 
-  getRemainingString = date => {
-    if (!date) return
-    const remaining = (date.getTime() - Date.now()) / 1000
-    if (remaining < 1) return
-    return this.getRemaining(remaining)
-  }
-
   render() {
     const swordRemainingString = this.getRemainingString(this.props.attackFinish)
     const shieldRemainingString = this.getRemainingString(this.props.defendFinish)
@@ -69,6 +72,7 @@ export default class ListItem extends React.Component<Props, State> {
       <TouchableHighlight
         underlayColor="transparent"
         onPress={this.onPress}
+        onLongPress={this.onLongPress}
       >
         <View style={styles.contentContainer}>
           <ItemIcon
@@ -121,7 +125,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     backgroundColor: "white",
     width: Dimensions.get("window").width,
-    height: 80,
+    height: 100,
     flexDirection: "row",
     justifyContent: "flex-start",
     paddingHorizontal: 8,
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   smallHeaderText: {
-    paddingTop: 5,
+    paddingTop: 10,
     fontSize: 12,
     flexWrap: "wrap",
     flexDirection: "column",

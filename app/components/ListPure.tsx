@@ -1,18 +1,26 @@
 import * as React from "react"
 import { StyleSheet, View, FlatList, DeviceInfo } from "react-native"
 
-import UserItem from "./UserItem"
+import UserAttackItem from "./UserAttackItem"
+import UserFriendItem from "./UserFriendItem"
 
 interface Props {
+  isFriendsList?: boolean,
   data: Object[],
-  onPress: (uid: string) => void,
+  onPress?: (uid: string) => void,
+  onLongPress?: (uid: string) => void,
 }
 
 const renderSeparator = (sectionId, rowId) => <View style={{ flex: 1, height: 1, backgroundColor: "#dedede" }} key={rowId} />
-const keyExtractor = (item, index) => index.toString()
+const keyExtractor = item => item
 
-export default class List extends React.Component<Props> {
-  renderItem = ({ item }) => <UserItem uid={item} onPress={this.props.onPress} />
+export default class ListPure extends React.Component<Props> {
+  renderItem = ({ item }) => {
+    console.log("Rendering: ", this.props.isFriendsList)
+    return this.props.isFriendsList
+      ? <UserFriendItem uid={item} onPress={this.props.onPress} onLongPress={this.props.onLongPress} />
+      : <UserAttackItem uid={item} onPress={this.props.onPress} onLongPress={this.props.onLongPress} />
+  }
 
   render() {
     return (
@@ -30,7 +38,6 @@ export default class List extends React.Component<Props> {
 
 const styles = StyleSheet.create({
   list: {
-    /// flex: 1,
     backgroundColor: "#dedede",
   },
 

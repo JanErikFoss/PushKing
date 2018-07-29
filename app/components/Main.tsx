@@ -2,22 +2,20 @@ import * as React from "react"
 import { StyleSheet, Text, View, Alert, Dimensions, Platform, TextInput, StatusBar, TouchableHighlight } from "react-native"
 
 import { connect } from "react-redux"
-import { setUser, setIncomingAttack, setOutgoingAttack } from "../actions"
+import { setIncomingAttack, setOutgoingAttack } from "../actions"
 
 import * as T from "../types"
 
-import List from "./List"
+import MoreCashText from "./MoreCashText"
+import Lists from "./Lists"
 
 import { auth, fs, functions } from "../modules/Firebase"
-const attack = functions().httpsCallable("attack")
 
 export interface Props {
   user: T.User,
-  users: T.User[],
   attacks: { [uid: string]: T.Attack },
-  setUser: (uid: string, user: Object) => void,
-  setIncomingAttack: (attack: Object) => void,
-  setOutgoingAttack: (attack: Object) => void,
+  setIncomingAttack: (uid: string, attack: T.Attack) => void,
+  setOutgoingAttack: (uid: string, attack: T.Attack) => void,
 }
 
 interface State {
@@ -36,8 +34,17 @@ class MainComponent extends React.Component<Props, State> {
   componentDidMount() {
     this.setIncomingAttackListener(null)
     this.setOutgoingAttackListener(null)
-    this.setUsersListener(null)
+
+    // this.attackMyself()
   }
+
+  attackMyself = () => fs().collection("attacks").add({
+    attacker: "FM8tExcdht8KP0sVM8SV",
+    defender: auth().currentUser.uid,
+    finishTime: new Date(Date.now() + 120 * 1000),
+    timestamp: new Date(),
+    state: "started",
+  })
 
   setIncomingAttackListener = err => {
     if (err) console.log("Error in attack listener: ", err)
@@ -45,34 +52,33 @@ class MainComponent extends React.Component<Props, State> {
     this.incomingAttackListener = fs().collection("attacks")
       .where("defender", "==", auth().currentUser.uid)
       .where("state", "==", "started")
-      .onSnapshot(qss => qss.docs.forEach(this.onIncomingAttack), this.setIncomingAttackListener)
+      .onSnapshot(this.onIncomingAttacks, this.setIncomingAttackListener)
   }
+  onIncomingAttacks = qss => qss.docChanges.forEach(change => {
+    const doc = change.doc
+    if (change.type === "removed") {
+      return doc.data() && this.props.setIncomingAttack(doc.data().attacker, null)
+    }
+    if (change.type === "modified") return this.onIncomingAttack(doc)
+    if (change.type === "added") return this.onIncomingAttack(doc)
+  })
+
   setOutgoingAttackListener = err => {
     if (err) console.log("Error in attack listener: ", err)
     this.outgoingAttackListener && this.outgoingAttackListener()
     this.outgoingAttackListener = fs().collection("attacks")
       .where("attacker", "==", auth().currentUser.uid)
       .where("state", "==", "started")
-      .onSnapshot(qss => qss.docs.forEach(this.onOutgoingAttack), this.setOutgoingAttackListener)
+      .onSnapshot(this.onOutgoingAttacks, this.setOutgoingAttackListener)
   }
-
-  setUsersListener = err => {
-    if (err) console.log("Error in users listener: ", err)
-    this.usersListener && this.usersListener()
-    this.usersListener = fs().collection("users").onSnapshot(this.onUsers, this.setUsersListener)
-  }
-  onUsers = qss => {
-    qss.docChanges.forEach(change => {
-      const doc = change._document
-      if (doc.id === auth().currentUser.uid) {
-        this.setState({ nickname: doc.data().nickname })
-      }
-
-      if (change.type === "modified") return this.props.setUser(doc.id, doc.data())
-      if (change.type === "added") return this.props.setUser(doc.id, doc.data())
-      if (change.tyoe === "removed") return this.props.setUser(doc.id, null)
-    })
-  }
+  onOutgoingAttacks = qss => qss.docChanges.forEach(change => {
+    const doc = change.doc
+    if (change.type === "removed") {
+      return doc.data() && this.props.setOutgoingAttack(doc.data().defender, null)
+    }
+    if (change.type === "modified") return this.onOutgoingAttack(doc)
+    if (change.type === "added") return this.onOutgoingAttack(doc)
+  })
 
   getAttackObj = doc => {
     const data = doc.exists && doc.data()
@@ -84,13 +90,15 @@ class MainComponent extends React.Component<Props, State> {
   onIncomingAttack = doc => {
     const attackObj = this.getAttackObj(doc)
     console.log("Incoming attack: ", attackObj)
-    this.props.setIncomingAttack(attackObj)
+    if (!attackObj) return
+    this.props.setIncomingAttack(attackObj.attacker, attackObj)
   }
 
   onOutgoingAttack = doc => {
     const attackObj = this.getAttackObj(doc)
     console.log("Outgoing attack: ", attackObj)
-    this.props.setOutgoingAttack(attackObj)
+    if (!attackObj) return
+    this.props.setOutgoingAttack(attackObj.defender, attackObj)
   }
 
   componentWillUnmount() {
@@ -107,38 +115,7 @@ class MainComponent extends React.Component<Props, State> {
 
   updateUserData = state => fs().doc("users/" + auth().currentUser.uid).set(state, { merge: true })
     .then(() => console.log("User data updated"))
-    .catch(err => console.log("Failed to update user data"))
-
-  onPress = (uid: string) => {
-    const incoming = this.props.attacks.incoming[uid]
-    if (incoming) return this.defend(incoming)
-
-    const outgoing = this.props.attacks.outgoing[uid]
-    if (outgoing) return Alert.alert("Already attacking", "You are already attacking this person")
-    return this.attack(uid)
-  }
-
-  defend = (attack: T.Attack): void => {
-    console.log("Defending attack: ", attack)
-
-    fs().doc("attacks/" + attack.attackId).update({ defended: true, state: "finished" })
-      .then(() => console.log("Successfully defended"))
-      .catch(err => {
-        console.log("Failed to defend against attack: ", err)
-        Alert.alert("Something went wrong", err.message)
-      })
-  }
-
-  attack = (uid: string): void => {
-    console.log("Attacking user: ", uid)
-
-    attack({ defender: uid })
-      .then(res => console.log("AttackId: ", res.data.attackId))
-      .catch(err => {
-        console.log("Error attacking " + uid + ": ", err)
-        Alert.alert("Something went wrong", err.message)
-      })
-  }
+    .catch(err => console.log("Failed to update user data: ", err))
 
   getRequiredCash = (level = 1) => {
     const nextLevel = level + 1
@@ -151,29 +128,33 @@ class MainComponent extends React.Component<Props, State> {
 
   levelUp = () => {
     console.log("Leveling up")
-    const requiredCash = this.getRequiredCash(this.props.user.level)
-    if (this.props.user.cash < requiredCash) return Alert.alert("Not enough cash")
+    const level = this.props.user.level || 1
+    const cash = this.props.user.cash || 0
+
+    const requiredCash = this.getRequiredCash(level)
+    if (cash < requiredCash) return Alert.alert("Not enough cash")
 
     this.updateUserData({
-      cash: Math.floor(this.props.user.cash - requiredCash),
-      level: this.props.user.level + 1,
+      cash: Math.floor(cash - requiredCash),
+      level: level + 1,
     })
   }
 
   render() {
     return (
       <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+        <StatusBar barStyle="light-content" />
         <View style={styles.innerContainer}>
           <TextInput
             style={styles.nicknameInput}
-            value={this.state.nickname}
+            value={this.props.user && this.props.user.nickname}
             placeholder="Set a nickname"
             onChangeText={this.onNicknameChange}
             allowFontScaling={false}
             placeholderTextColor="silver"
           />
           <Text style={styles.cashText}>{"Cash: " + (this.props.user.cash || 0)}</Text>
+          <MoreCashText level={(this.props.user.level || 1)} />
           <TouchableHighlight
             underlayColor="transparent"
             onPress={this.levelUp}
@@ -184,10 +165,7 @@ class MainComponent extends React.Component<Props, State> {
             </View>
           </TouchableHighlight>
         </View>
-        <List
-          data={Object.keys(this.props.users).filter(uid => uid !== auth().currentUser.uid)}
-          onPress={this.attack}
-        />
+        <Lists />
       </View>
     )
   }
@@ -195,13 +173,11 @@ class MainComponent extends React.Component<Props, State> {
 
 const mapStateToProps = (state, props) => ({
   user: state.users[auth().currentUser.uid] || {},
-  users: state.users,
   attacks: state.attacks,
 })
 const mapDispatchToProps = dispatch => ({
-  setUser: (uid, user) => dispatch({ uid, payload: user, type: setUser }),
-  setIncomingAttack: attack => dispatch({ type: setIncomingAttack, uid: attack.attacker, payload: attack }),
-  setOutgoingAttack: attack => dispatch({ type: setOutgoingAttack, uid: attack.defender, payload: attack }),
+  setIncomingAttack: (uid, attack) => dispatch({ uid, type: setIncomingAttack, payload: attack }),
+  setOutgoingAttack: (uid, attack) => dispatch({ uid, type: setOutgoingAttack, payload: attack }),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(MainComponent)
 
@@ -210,13 +186,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
-    alignItems: "center",
-    justifyContent: "center",
-    // paddingTop: Platform.OS === "ios" ? 64 : 10,
+    // alignItems: "center",
+    // justifyContent: "center",
   },
 
   innerContainer: {
-    height: 200,
+    height: 210,
     width: Dimensions.get("window").width,
     paddingTop: Platform.OS === "ios" ? 40 : 10,
     backgroundColor: "#9b59b6",
@@ -231,12 +206,13 @@ const styles = StyleSheet.create({
   cashText: {
     fontSize: 25,
     color: "white",
-    padding: 20,
+    paddingTop: 20,
   },
 
   levelText: {
     fontSize: 20,
     color: "white",
+    paddingTop: 20,
   },
 
   levelUpButton: {
