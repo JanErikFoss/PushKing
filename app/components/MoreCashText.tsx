@@ -59,7 +59,7 @@ export default class MoreCashText extends React.Component<Props> {
 
     const cash = this.props.level * this.cashPerLevelPerInterval
 
-    return <Text style={styles.text}>{"+" + cash + " in ~" + text}</Text>
+    return <Text style={styles.text}>{"+" + cash + " in " + text}</Text>
   }
 }
 

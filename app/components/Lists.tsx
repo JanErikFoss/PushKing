@@ -9,11 +9,11 @@ import SearchList from "./SearchList"
 
 export default class TabViewExample extends React.Component {
   state = {
-    index: 1,
+    index: 0,
     routes: [
       { key: "attacks", title: "Attacks" },
-      { key: "top", title: "Top" },
       { key: "friends", title: "Friends" },
+      { key: "top", title: "Top" },
     ],
   }
 
