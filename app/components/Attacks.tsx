@@ -62,24 +62,40 @@ class TopList extends React.Component<Props, State> {
   }
 
   onIncoming = qss => {
-    console.log("Incoming attacks: ", qss.docs)
-    const docs = qss.docs.filter(doc => doc.exists)
-    docs.forEach(doc => {
-      const data = doc.data()
-      this.props.setIncomingAttack(data.attacker, data)
-      monitorUser(data.attacker)
+    const uids = qss.docs.filter(doc => doc.exists).map(doc => doc.data().attacker)
+    this.setState({ incoming: uids })
+    console.log("Incoming attacks: ", uids)
+
+    qss.docChanges.forEach(change => {
+      const doc = change.doc
+      const data = doc.exists && doc.data()
+      if (change.type === "removed" || !data) {
+        this.props.setIncomingAttack(data.attacker, null)
+        // Should probably remove user listener here, but what if some other part of the app depends on the listener?
+        return console.log("Incoming attack removed: ", doc.id)
+      }
+
+      this.props.setIncomingAttack(data.attacker, { ...data, attackId: doc.id })
+      monitorUser(data.attacker, "Attacks.tsx")
     })
-    this.setState({ incoming: docs.map(doc => doc.data().attacker) })
   }
   onOutgoing = qss => {
-    console.log("Outgoing attacks: ", qss.docs)
-    const docs = qss.docs.filter(doc => doc.exists)
-    docs.forEach(doc => {
-      const data = doc.data()
-      this.props.setOutgoingAttack(data.defender, data)
-      monitorUser(data.defender)
+    const uids = qss.docs.filter(doc => doc.exists).map(doc => doc.data().defender)
+    this.setState({ outgoing: uids })
+    console.log("Outgoing attacks: ", uids)
+
+    qss.docChanges.forEach(change => {
+      const doc = change.doc
+      const data = doc.exists && doc.data()
+      if (change.type === "removed" || !data) {
+        this.props.setOutgoingAttack(data.defender, null)
+        // Should probably remove user listener here, but what if some other part of the app depends on the listener?
+        return console.log("Outgoing attack removed: ", doc.id)
+      }
+
+      this.props.setOutgoingAttack(data.defender, { ...data, attackId: doc.id })
+      monitorUser(data.defender, "Attacks.tsx")
     })
-    this.setState({ outgoing: docs.map(doc => doc.data().defender) })
   }
 
   onPress = (uid: string) => {

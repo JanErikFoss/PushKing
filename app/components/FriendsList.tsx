@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, View, TextInput } from "react-native"
 
 import { default as ActionSheet } from "react-native-actionsheet"
 
@@ -11,7 +11,9 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser, attackUser, toggleFriend } from "../modules/Actions"
+import { actionOnUser, attackUser, toggleFriend, monitorUser } from "../modules/Actions"
+
+const DELAY = 1 * 500
 
 export interface Props {
   user: T.User,
@@ -21,59 +23,41 @@ export interface Props {
 }
 
 interface State {
+  nickname: string,
+  uids: string[],
 }
 
 class FriendsList extends React.Component<Props, State> {
+  state = { nickname: "", uids: [] }
   listener = null
   userListeners = {}
   unmounted = false
   actionSheet = null
   asUid = null
+  timeout = null
 
-  componentDidMount() {
-    this.startListener()
-  }
   componentWillUnmount() {
     this.unmounted = true
-    this.listener && this.listener()
-    Object.values(this.userListeners).forEach(listener => listener && listener())
+  }
+  componentDidUpdate() {
+    this.props.friends.forEach(uid => monitorUser(uid, "FriendsList.tsx"))
   }
 
   startListener = () => {
-    if (this.unmounted) return
     console.log("Starting listener")
-    this.listener = fs().doc("users/" + auth().currentUser.uid).onSnapshot(this.onChange, this.onError)
+    this.listener && this.listener()
+    this.listener = fs().collection("users")
+      .where("nickname", ">=", this.state.nickname)
+      .limit(6)
+      .onSnapshot(this.onQss, err => console.log("Listener error: ", err))
   }
-  onError = err => {
-    console.log("Listener error: ", err)
-    setTimeout(this.startListener, 1000)
-  }
-  onChange = doc => {
-    const data = doc.exists && doc.data()
-    if (!data) return console.log("User data does not exist")
-    console.log("User data changed: ", data)
-    this.props.setUser(doc.id, data)
+  onQss = qss => {
+    const docs = qss.docs
+      .filter(doc => doc.exists && doc.id !== auth().currentUser.uid)
 
-    const friends = data.friends || {}
-    Object.keys(friends || {})
-      .filter(uid => friends[uid])
-      .filter(uid => !this.userListeners[uid])
-      .forEach(this.setFriendDataListener)
-  }
-
-  setFriendDataListener = uid => {
-    if (this.unmounted) return
-    console.log("Setting friend data listener for uid " + uid)
-    this.userListeners[uid] = fs().doc("users/" + uid).onSnapshot(this.onFriendData, err => this.onFriendError(err, uid))
-  }
-  onFriendError = (err, uid) => {
-    console.log("Friend data listener error: ", err)
-    setTimeout(() => this.setFriendDataListener(uid), 1000)
-  }
-  onFriendData = doc => {
-    const data = doc.exists && doc.data()
-    console.log("Friend " + doc.id + ": ", data)
-    this.props.setUser(doc.id, data)
+    docs.forEach(doc => this.props.setUser(doc.id, doc.data()))
+    const uids = docs.map(doc => doc.id)
+    this.setState({ uids })
   }
 
   onLongPress = (uid: string) => {
@@ -89,6 +73,12 @@ class FriendsList extends React.Component<Props, State> {
     Attack: () => attackUser(this.asUid)
   }
 
+  onTextChange = nickname => {
+    this.setState({ nickname })
+    this.timeout && clearInterval(this.timeout)
+    if (nickname) this.timeout = setTimeout(this.startListener, DELAY)
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -98,9 +88,17 @@ class FriendsList extends React.Component<Props, State> {
           cancelButtonIndex={0}
           onPress={this.onActionSheetPressed}
         />
+        <TextInput
+          style={styles.input}
+          placeholder="Search"
+          onChangeText={this.onTextChange}
+          allowFontScaling={false}
+          placeholderTextColor="silver"
+        />
         <ListPure
-          data={this.props.friends}
-          onPress={actionOnUser}
+          isFriendsList={!!this.state.nickname}
+          data={this.state.nickname ? this.state.uids : this.props.friends}
+          onPress={toggleFriend}
           onLongPress={this.onLongPress}
         />
       </View>
@@ -127,5 +125,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#dedede",
-  }
+  },
+
+  input: {
+    backgroundColor: "white",
+    height: 60,
+    padding: 15,
+    fontSize: 18,
+    marginBottom: 1,
+  },
 })

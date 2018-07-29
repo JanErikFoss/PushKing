@@ -7,6 +7,7 @@ import MoreCashText from "./MoreCashText"
 import Lists from "./Lists"
 
 import { auth, fs } from "../modules/Firebase"
+import { monitorUser } from "../modules/Actions"
 
 export interface Props {
   cash: number,
@@ -21,6 +22,19 @@ const NICKNAME_UPDATE_DELAY = 1 * 1000
 
 class MainComponent extends React.Component<Props, State> {
   nicknameUpdateTimeout = null
+
+  componentDidMount() {
+    monitorUser(auth().currentUser.uid, "Main.tsx")
+    // this.attackMyself()
+  }
+
+  attackMyself = () => fs().collection("attacks").add({
+    attacker: "Vd9ZQiDAFFQDzFAZ52vL",
+    defender: auth().currentUser.uid,
+    timestamp: new Date(),
+    state: "started",
+    finishTime: new Date(Date.now() + 120 * 1000),
+  })
 
   onNicknameChange = nickname => {
     this.setState({ nickname })

@@ -43,7 +43,7 @@ class TopList extends React.Component<Props, State> {
     this.listener && this.listener()
     this.listener = fs().collection("users")
       .orderBy("cash", "desc")
-      .limit(10)
+      .limit(20)
       .onSnapshot(this.onUsers, this.restartListener)
   }
 

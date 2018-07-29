@@ -14,7 +14,6 @@ export default class TabViewExample extends React.Component {
       { key: "attacks", title: "Attacks" },
       { key: "top", title: "Top" },
       { key: "friends", title: "Friends" },
-      { key: "search", title: "Search" },
     ],
   }
 
