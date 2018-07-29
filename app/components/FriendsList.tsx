@@ -69,8 +69,9 @@ class FriendsList extends React.Component<Props, State> {
   onActionSheetPressed = i => Object.values(this.actionSheetConfig)[i]()
   actionSheetConfig = {
     Cancel: () => {},
-    "Remove friend": () => toggleFriend(this.asUid),
-    Attack: () => attackUser(this.asUid)
+    Attack: () => attackUser(this.asUid),
+    "Add friend": () => toggleFriend(this.asUid, true),
+    "Remove friend": () => toggleFriend(this.asUid, false),
   }
 
   onTextChange = nickname => {
@@ -98,7 +99,7 @@ class FriendsList extends React.Component<Props, State> {
         <ListPure
           isFriendsList={!!this.state.nickname}
           data={this.state.nickname ? this.state.uids : this.props.friends}
-          onPress={toggleFriend}
+          onPress={this.state.nickname ? toggleFriend : actionOnUser}
           onLongPress={this.onLongPress}
         />
       </View>
