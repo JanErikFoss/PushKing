@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, Text, View, YellowBox } from "react-native"
+import { StyleSheet, Text, View, YellowBox, ActivityIndicator } from "react-native"
 
 import Main from "./Main"
 
@@ -39,7 +39,7 @@ export default class App extends React.Component<Props, State> {
         {this.state.loggedIn ? (
           <Main />
         ) : (
-          <Text>Signing in...</Text>
+          <ActivityIndicator size="large" color="white" />
         )}
       </View>
     )
@@ -51,5 +51,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#9b59b6",
   },
 })
