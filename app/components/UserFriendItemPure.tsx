@@ -19,10 +19,6 @@ interface State {
 }
 
 export default class UserFriendItemPure extends React.Component<Props, State> {
-  componentDidMount() {
-    console.log("Pure props: ", this.props)
-  }
-
   onPress = (x:any): boolean => {
     this.props.onPress && this.props.onPress()
     return false
@@ -34,7 +30,6 @@ export default class UserFriendItemPure extends React.Component<Props, State> {
   }
 
   render() {
-    console.log("Rendering pure friend item with props: ", this.props)
     return (
       <TouchableHighlight
         underlayColor="transparent"

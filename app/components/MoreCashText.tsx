@@ -9,7 +9,7 @@ const getNext = () => {
   return new Date(Math.ceil(Date.now() / coeff) * coeff)
 }
 
-getRemainingString = date => {
+const getRemainingString = date => {
   if (!date) return null
   const remaining = (date.getTime() - Date.now()) / 1000
   if (remaining < 1) return null
@@ -21,18 +21,19 @@ getRemainingString = date => {
     if (i === 1) return "1 sec"
     return i + " sec"
   }
-  if (i < 3600) {
-    const minutes = Math.round(i / 60) || 0
-    if (minutes === 1) return "1 min"
-    return minutes + " min"
-  }
-  const hours = Math.round(i / 3600)
-  if (hours === 1) return "1 hour"
-  return hours + " hours"
+
+  const minutes = Math.round(i / 60) || 0
+  if (minutes === 1) return "1 min"
+  return minutes + " min"
 }
 
-export default class MoreCashText extends React.Component {
+interface Props {
+  level: number,
+}
+
+export default class MoreCashText extends React.Component<Props> {
   cashPerLevelPerInterval = 500
+  interval = null
 
   componentDidMount() {
     this.update()
@@ -54,11 +55,7 @@ export default class MoreCashText extends React.Component {
 
   render() {
     const next = getNext()
-    const text = getRemainingString(next)
-    if (!text) {
-      console.log("Not rendering MoreCashText")
-      return null
-    }
+    const text = getRemainingString(next) || "0 sec"
 
     const cash = this.props.level * this.cashPerLevelPerInterval
 

@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser } from "../modules/Actions"
+import { actionOnUser, attackUser, toggleFriend } from "../modules/Actions"
 
 export interface Props {
   user: T.User,
@@ -85,9 +85,8 @@ class FriendsList extends React.Component<Props, State> {
   onActionSheetPressed = i => Object.values(this.actionSheetConfig)[i]()
   actionSheetConfig = {
     Cancel: () => {},
-    Apple: () => console.log("He likes apples"),
-    Orange: () => console.log("He likes oranges"),
-    "With space": () => console.log("He likes spaces"),
+    "Remove friend": () => toggleFriend(this.asUid),
+    Attack: () => attackUser(this.asUid)
   }
 
   render() {
@@ -102,7 +101,7 @@ class FriendsList extends React.Component<Props, State> {
         <ListPure
           data={this.props.friends}
           onPress={actionOnUser}
-          onLongPress={this.openActionSheet}
+          onLongPress={this.onLongPress}
         />
       </View>
     )

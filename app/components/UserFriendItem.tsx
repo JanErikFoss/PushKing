@@ -22,10 +22,6 @@ interface State {
 }
 
 export class UserFriendItemComponent extends React.Component<Props, State> {
-  componentDidMount() {
-    console.log("Friend props: ", this.props)
-  }
-
   onPress = () => this.props.onPress && this.props.onPress(this.props.uid)
   onLongPress = () => this.props.onLongPress && this.props.onLongPress(this.props.uid)
 
@@ -34,8 +30,6 @@ export class UserFriendItemComponent extends React.Component<Props, State> {
       console.log("Skipping render of null user object")
       return null
     }
-
-    console.log("Rendering non-pure item with props: ", this.props)
 
     return (
       <UserFriendItemPure

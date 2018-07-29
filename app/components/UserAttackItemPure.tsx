@@ -50,18 +50,8 @@ export default class ListItem extends React.Component<Props, State> {
     const i = Math.floor(remaining)
 
     if (i < 1) return "0s"
-    if (i < 60) {
-      if (i === 1) return "1s"
-      return i + "s"
-    }
-    if (i < 3600) {
-      const minutes = Math.round(i / 60) || 0
-      if (minutes === 1) return "1m"
-      return minutes + "m"
-    }
-    const hours = Math.round(i / 3600)
-    if (hours === 1) return "1h"
-    return hours + "h"
+    if (i === 1) return "1s"
+    return i + "s"
   }
 
   render() {

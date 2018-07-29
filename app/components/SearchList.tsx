@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { toggleFriend } from "../modules/Actions"
+import { toggleFriend, attackUser } from "../modules/Actions"
 
 const DELAY = 1 * 500
 
@@ -68,13 +68,12 @@ class SearchList extends React.Component<Props, State> {
   onActionSheetPressed = i => Object.values(this.actionSheetConfig)[i]()
   actionSheetConfig = {
     Cancel: () => {},
-    Apple: () => console.log("Apples: " + this.asUid),
-    Orange: () => console.log("He likes oranges"),
-    "With space": () => console.log("He likes spaces"),
+    "Add friend": () => toggleFriend(this.asUid, true),
+    "Remove friend": () => toggleFriend(this.asUid, false),
+    Attack: () => attackUser(this.asUid)
   }
 
   render() {
-    console.log("Rendering searchlist with uids: ", this.state.uids)
     return (
       <View style={styles.container}>
         <ActionSheet

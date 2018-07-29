@@ -16,7 +16,6 @@ const keyExtractor = item => item
 
 export default class ListPure extends React.Component<Props> {
   renderItem = ({ item }) => {
-    console.log("Rendering: ", this.props.isFriendsList)
     return this.props.isFriendsList
       ? <UserFriendItem uid={item} onPress={this.props.onPress} onLongPress={this.props.onLongPress} />
       : <UserAttackItem uid={item} onPress={this.props.onPress} onLongPress={this.props.onLongPress} />

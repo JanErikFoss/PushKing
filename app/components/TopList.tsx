@@ -11,7 +11,7 @@ import * as T from "../types"
 import ListPure from "./ListPure"
 
 import { auth, fs } from "../modules/Firebase"
-import { actionOnUser } from "../modules/Actions"
+import { actionOnUser, attackUser } from "../modules/Actions"
 
 export interface Props {
   user: T.User,
@@ -50,7 +50,7 @@ class TopList extends React.Component<Props, State> {
   onUsers = qss => {
     const docs = qss.docs
       .filter(doc => doc.exists)
-      .filter(doc => doc.id !== auth().currentUser.uid)
+      // .filter(doc => doc.id !== auth().currentUser.uid)
 
     docs.forEach(doc => this.props.setUser(doc.id, doc.data()))
 
@@ -58,7 +58,12 @@ class TopList extends React.Component<Props, State> {
     this.setState({ uids })
   }
 
+  onPress = (uid: string) => {
+    if (uid === auth().currentUser.uid) return
+    actionOnUser(uid)
+  }
   onLongPress = (uid: string) => {
+    if (uid === auth().currentUser.uid) return
     this.asUid = uid
     this.actionSheet && this.actionSheet.show()
   }
@@ -67,9 +72,7 @@ class TopList extends React.Component<Props, State> {
   onActionSheetPressed = i => Object.values(this.actionSheetConfig)[i]()
   actionSheetConfig = {
     Cancel: () => {},
-    Apple: () => console.log("He likes apples"),
-    Orange: () => console.log("He likes oranges"),
-    "With space": () => console.log("He likes spaces"),
+    Attack: () => attackUser(this.asUid)
   }
 
   render() {
@@ -83,8 +86,8 @@ class TopList extends React.Component<Props, State> {
         />
         <ListPure
           data={this.state.uids}
-          onPress={actionOnUser}
-          onLongPress={this.openActionSheet}
+          onPress={this.onPress}
+          onLongPress={this.onLongPress}
         />
       </View>
     )
@@ -98,8 +101,6 @@ const mapStateToProps = (state, props) => ({
 })
 const mapDispatchToProps = dispatch => ({
   setUser: (uid, user) => dispatch({ uid, payload: user, type: setUser }),
-  setIncomingAttack: (uid, attack) => dispatch({ uid, type: setIncomingAttack, payload: attack }),
-  setOutgoingAttack: (uid, attack) => dispatch({ uid, type: setOutgoingAttack, payload: attack }),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(TopList)
 

@@ -4,7 +4,7 @@ import { createLogger } from "redux-logger"
 import UsersReducer from "../reducers/UsersReducer"
 import AttacksReducer from "../reducers/AttacksReducer"
 
-const LOG_REDUX = true && __DEV__
+const LOG_REDUX = false && __DEV__
 // const USE_STORAGE = true
 
 // Combine all reducers
