@@ -51,13 +51,13 @@ class TopList extends React.Component<Props, State> {
     this.inListener = fs().collection("attacks")
       .where("defender", "==", auth().currentUser.uid)
       .where("state", "==", "started")
-      .limit(10)
+      .limit(50)
       .onSnapshot(this.onIncoming, this.restartListeners)
 
     this.outListener = fs().collection("attacks")
       .where("attacker", "==", auth().currentUser.uid)
       .where("state", "==", "started")
-      .limit(10)
+      .limit(50)
       .onSnapshot(this.onOutgoing, this.restartListeners)
   }
 
@@ -65,8 +65,9 @@ class TopList extends React.Component<Props, State> {
     console.log("Incoming attacks: ", qss.docs)
     const docs = qss.docs.filter(doc => doc.exists)
     docs.forEach(doc => {
-      this.props.setIncomingAttack(doc.id, doc.data())
-      monitorUser(doc.data().attacker)
+      const data = doc.data()
+      this.props.setIncomingAttack(data.attacker, data)
+      monitorUser(data.attacker)
     })
     this.setState({ incoming: docs.map(doc => doc.data().attacker) })
   }
@@ -74,8 +75,9 @@ class TopList extends React.Component<Props, State> {
     console.log("Outgoing attacks: ", qss.docs)
     const docs = qss.docs.filter(doc => doc.exists)
     docs.forEach(doc => {
-      this.props.setOutgoingAttack(doc.id, doc.data())
-      monitorUser(doc.data().defender)
+      const data = doc.data()
+      this.props.setOutgoingAttack(data.defender, data)
+      monitorUser(data.defender)
     })
     this.setState({ outgoing: docs.map(doc => doc.data().defender) })
   }
