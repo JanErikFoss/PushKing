@@ -91,10 +91,14 @@ export const attackUser = async (uid: string) => {
 
     const localUser = state.users[auth().currentUser.uid]
     if (!localUser) throw new Error("User not loaded, please try again")
-    const cashPerInterval = (await config().getValue("cash_per_level_per_interval")).val()
-    const requiredCash = localUser.level * cashPerInterval * 3
+
+    const [cashPerInterval, requiredMultiplier] = await Promise.all([
+      config().getValue("cash_per_level_per_interval"),
+      config().getValue("cash_intervals_required_for_attack"),
+    ])
+    const requiredCash = localUser.level * cashPerInterval.val() * requiredMultiplier.val()
     if (localUser.cash < requiredCash) {
-      // return Alert.alert("Not enough cash", "You need at least " + requiredCash + " to attack someone")
+      return Alert.alert("Not enough cash", "You need at least " + requiredCash + " to attack someone")
     }
 
     const res = await cloudFunctionAttack({ defender: uid })

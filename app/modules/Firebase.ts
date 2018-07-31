@@ -4,6 +4,7 @@ reactNativeFirebase.config().enableDeveloperMode()
 reactNativeFirebase.config().setDefaults({
   cash_per_level_per_interval: 100,
   cash_interval_length: 5 * 60 * 1000,
+  cash_intervals_required_for_attack: 3,
 })
 reactNativeFirebase.config().fetch(0)
   .then(() => reactNativeFirebase.config().activateFetched())
