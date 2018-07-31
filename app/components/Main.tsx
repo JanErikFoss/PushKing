@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, Alert, Dimensions, Platform, TextInput, StatusB
 
 import { connect } from "react-redux"
 
+import * as T from "../types"
+
 import MoreCashText from "./MoreCashText"
 import Lists from "./Lists"
 
@@ -10,9 +12,7 @@ import { auth, fs } from "../modules/Firebase"
 import { monitorUser } from "../modules/Actions"
 
 export interface Props {
-  cash: number,
-  level: number,
-  nickname: string,
+  user: T.User,
 }
 
 interface State {
@@ -57,8 +57,8 @@ class MainComponent extends React.Component<Props, State> {
 
   levelUp = () => {
     console.log("Leveling up")
-    const level = this.props.level
-    const cash = this.props.cash
+    const level = this.props.user.level
+    const cash = this.props.user.cash
 
     const requiredCash = this.getRequiredCash(level)
     if (cash < requiredCash) return Alert.alert("Not enough cash")
@@ -72,25 +72,24 @@ class MainComponent extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" />
         <View style={styles.innerContainer}>
           <TextInput
             style={styles.nicknameInput}
-            value={this.props.nickname}
+            value={this.props.user.nickname}
             placeholder="Set a nickname"
             onChangeText={this.onNicknameChange}
             allowFontScaling={false}
             placeholderTextColor="silver"
           />
-          <Text style={styles.cashText}>{"Cash: " + (this.props.cash || 0).toLocaleString()}</Text>
-          <MoreCashText level={(this.props.level || 1)} />
+          <Text style={styles.cashText}>{"Cash: " + this.props.user.cash.toLocaleString()}</Text>
+          <MoreCashText level={this.props.user.level} />
           <TouchableHighlight
             underlayColor="transparent"
             onPress={this.levelUp}
           >
             <View style={styles.levelUpButton}>
-              <Text style={styles.levelText}>{"Level " + (this.props.level || 1).toLocaleString()}</Text>
-              <Text style={styles.levelUpText}>{"Level up for " + this.getRequiredCash(this.props.level).toLocaleString() + " cash"}</Text>
+              <Text style={styles.levelText}>{"Level " + this.props.user.level.toLocaleString()}</Text>
+              <Text style={styles.levelUpText}>{"Level up for " + this.getRequiredCash(this.props.user.level).toLocaleString() + " cash"}</Text>
             </View>
           </TouchableHighlight>
         </View>
@@ -100,14 +99,9 @@ class MainComponent extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  const user = state.users[auth().currentUser.uid] || {}
-  return {
-    cash: user.cash || 0,
-    level: user.level || 1,
-    nickname: user.nickname,
-  }
-}
+const mapStateToProps = (state, props) => ({
+  user: state.users[auth().currentUser.uid]
+})
 const mapDispatchToProps = null
 export default connect(mapStateToProps, mapDispatchToProps)(MainComponent)
 

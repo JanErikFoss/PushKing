@@ -58,9 +58,9 @@ class TopList extends React.Component<Props, State> {
     this.setState({ uids })
   }
 
-  onPress = (uid: string) => {
+  onPress = async (uid: string) => {
     if (uid === auth().currentUser.uid) return
-    actionOnUser(uid)
+    return actionOnUser(uid)
   }
   onLongPress = (uid: string) => {
     if (uid === auth().currentUser.uid) return

@@ -36,8 +36,8 @@ export class UserFriendItemComponent extends React.Component<Props, State> {
         icon="person"
         headers={[
           this.props.user.nickname || "Mysterious figure",
-          "Cash: " + (this.props.user.cash || 0).toLocaleString(),
-          "Level: " + (this.props.user.level || 1).toLocaleString(),
+          "Cash: " + this.props.user.cash.toLocaleString(),
+          "Level: " + this.props.user.level.toLocaleString(),
         ]}
         isFriends={this.props.isFriends}
         onPress={this.onPress}
@@ -56,6 +56,5 @@ const mapStateToProps = (state, props) => {
     user: state.users[props.uid],
   }
 }
-const mapDispatchToProps = dispatch => ({
-})
+const mapDispatchToProps = null
 export default connect(mapStateToProps, mapDispatchToProps)(UserFriendItemComponent)

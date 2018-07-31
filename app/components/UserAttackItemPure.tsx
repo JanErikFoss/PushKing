@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, View, TouchableHighlight, Text, Dimensions, Image } from "react-native"
+import { StyleSheet, View, TouchableHighlight, Text, Dimensions, Image, ActivityIndicator } from "react-native"
 
 import ItemIcon from "./ListItems/ItemIcon"
 
@@ -10,6 +10,8 @@ interface Props {
   icon: string,
   headers: string[],
   color?: string,
+  showSwordSpinner?: boolean,
+  showShieldSpinner?: boolean,
 
   attackFinish?: Date,
   defendFinish?: Date,
@@ -88,20 +90,28 @@ export default class ListItem extends React.Component<Props, State> {
           </View>
 
           <View style={styles.imageContainer}>
-            {swordRemainingString && (
+            {shieldRemainingString && (
               <React.Fragment>
                 <Image source={SHIELD} style={styles.image} />
-                <Text>{swordRemainingString}</Text>
+                <Text>{shieldRemainingString}</Text>
               </React.Fragment>
+            )}
+
+            {!shieldRemainingString && this.props.showShieldSpinner && (
+              <ActivityIndicator size="small" color="#b4b4b4" />
             )}
           </View>
 
           <View style={styles.imageContainer}>
-            {shieldRemainingString && (
+            {swordRemainingString && (
               <React.Fragment>
                 <Image source={SWORD} style={styles.image} />
-                <Text>{shieldRemainingString}</Text>
+                <Text>{swordRemainingString}</Text>
               </React.Fragment>
+            )}
+
+            {!swordRemainingString && this.props.showSwordSpinner && (
+              <ActivityIndicator size="small" color="#b4b4b4" />
             )}
           </View>
 

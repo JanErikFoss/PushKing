@@ -7,7 +7,7 @@ import UserFriendItem from "./UserFriendItem"
 interface Props {
   isFriendsList?: boolean,
   data: Object[],
-  onPress?: (uid: string) => void,
+  onPress?: (uid: string) => Promise<void>,
   onLongPress?: (uid: string) => void,
 }
 

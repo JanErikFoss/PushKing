@@ -3,7 +3,7 @@ import { Alert } from "react-native"
 
 import { setUser } from "../actions"
 import ReduxStore from "./ReduxStore"
-import { auth, fs, functions } from "./Firebase"
+import { auth, fs, functions, config } from "./Firebase"
 
 import * as T from "../types"
 
@@ -37,7 +37,7 @@ export const monitorUser = (uid: string, tag: string) => {
   userListeners[tag][uid] = fs().doc("users/" + uid).onSnapshot(onSnapshot, onError)
 }
 
-export const toggleFriend = (uid: string, val?: boolean) => {
+export const toggleFriend = async (uid: string, val?: boolean) => {
   const localUser = ReduxStore.getState().users[auth().currentUser.uid]
   if (!localUser) return console.log("Local user not found in redux store")
 
@@ -48,15 +48,16 @@ export const toggleFriend = (uid: string, val?: boolean) => {
     ? console.log("Removing " + uid + " from friends list")
     : console.log("Adding " + uid + " to friends list")
 
-  return fs().doc("users/" + auth().currentUser.uid).update({ ["friends." + uid]: newVal })
-    .then(() => console.log("Friend status changed"))
-    .catch(err => {
-      console.log("Failed to change friend status: ", err)
-      Alert.alert("Something went wrong", err.message)
-    })
+  try {
+    await fs().doc("users/" + auth().currentUser.uid).update({ ["friends." + uid]: newVal })
+    console.log("Friend status changed")
+  } catch (err) {
+    console.log("Failed to change friend status: ", err)
+    Alert.alert("Something went wrong", err.message)
+  }
 }
 
-export const actionOnUser = (uid: string) => {
+export const actionOnUser = async (uid: string) => {
   const attacks = ReduxStore.getState().attacks
 
   if (attacks.incoming[uid]) return defend(uid)
@@ -83,8 +84,18 @@ export const defend = async (uid: string) => {
 export const attackUser = async (uid: string) => {
   try {
     console.log("Attacking user: ", uid)
-    const attack = ReduxStore.getState().attacks.outgoing[uid]
+
+    const state = ReduxStore.getState()
+    const attack = state.attacks.outgoing[uid]
     if (attack) throw new Error("Already attacking that user")
+
+    const localUser = state.users[auth().currentUser.uid]
+    if (!localUser) throw new Error("User not loaded, please try again")
+    const cashPerInterval = (await config().getValue("cash_per_level_per_interval")).val()
+    const requiredCash = localUser.level * cashPerInterval * 3
+    if (localUser.cash < requiredCash) {
+      // return Alert.alert("Not enough cash", "You need at least " + requiredCash + " to attack someone")
+    }
 
     const res = await cloudFunctionAttack({ defender: uid })
     console.log("AttackId: ", res.data.attackId)

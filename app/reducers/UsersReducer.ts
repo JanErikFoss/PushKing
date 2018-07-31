@@ -10,7 +10,7 @@ export default (state = defaultState, action) => {
     case setUser:
       return {
         ...state,
-        [action.uid]: action.payload,
+        [action.uid]: { cash: 0, level: 1, ...action.payload },
       }
 
     default:

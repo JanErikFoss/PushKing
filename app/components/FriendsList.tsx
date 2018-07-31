@@ -92,7 +92,7 @@ class FriendsList extends React.Component<Props, State> {
         />
         <TextInput
           style={styles.input}
-          placeholder="Search"
+          placeholder="Add friends"
           onChangeText={this.onTextChange}
           allowFontScaling={false}
           placeholderTextColor="silver"
