@@ -16,6 +16,14 @@ export default class TabViewExample extends React.Component {
     ],
   }
 
+  renderTabBar = props => (
+    <TabBar
+      {...props}
+      style={{ backgroundColor: "#9b59b6" }}
+      indicatorStyle={{ backgroundColor: "white" }}
+    />
+  )
+
   render() {
     return (
       <TabView
@@ -27,6 +35,7 @@ export default class TabViewExample extends React.Component {
         })}
         onIndexChange={index => this.setState({ index })}
         initialLayout={{ width: Dimensions.get("window").width, height: 0 }}
+        renderTabBar={this.renderTabBar}
       />
     )
   }

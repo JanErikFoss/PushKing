@@ -25,6 +25,7 @@ export class UserAttackItemComponent extends React.Component<Props, State> {
 
   onPress = async () => {
     if (!this.props.onPress) return
+    if (this.state.showSpinner) return
     try {
       this.setState({ showSpinner: true })
       await this.props.onPress(this.props.uid)

@@ -7,6 +7,10 @@ import { auth, fs, functions, config } from "./Firebase"
 
 import * as T from "../types"
 
+interface UserListeners {
+  [tag: string]: { [uid: string]: () => void }
+}
+
 const cloudFunctionAttack = functions().httpsCallable("attack")
 
 let unmounted = false
@@ -17,7 +21,7 @@ export const unmount = () => {
   })
 }
 
-const userListeners = {}
+const userListeners: UserListeners = {}
 export const monitorUser = (uid: string, tag: string) => {
   console.log("Monitoring user: " + uid + " for " + tag)
   if (!uid) return console.log("Tried to monitor null uid")
@@ -112,10 +116,13 @@ export const attackUser = async (uid: string) => {
 export const reportUser = async (uid: string, reason: string) => {
   try {
     console.log("Reporting user " + uid)
+    const user = ReduxStore.getState().users[uid] || {}
+
     await fs().collection("reports").add({
       reason,
       reporter: auth().currentUser.uid,
       reported: uid,
+      nickname: user.nickname,
     })
     Alert.alert("Thank you", "Your report has been logged")
   } catch (err) {

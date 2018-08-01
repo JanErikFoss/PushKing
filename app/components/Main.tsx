@@ -25,6 +25,11 @@ class MainComponent extends React.Component<Props, State> {
 
   componentDidMount() {
     monitorUser(auth().currentUser.uid, "Main.tsx")
+
+    if ((!this.props.user.cash && this.props.user.cash !== 0) || !this.props.user.level) {
+      this.updateUserData({ cash: this.props.user.cash || 0, level: this.props.user.level || 1 })
+    }
+
     // this.attackMyself()
   }
 

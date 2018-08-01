@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, Text, View, YellowBox, ActivityIndicator, StatusBar } from "react-native"
+import { StyleSheet, View, YellowBox, ActivityIndicator, StatusBar, Alert } from "react-native"
 import * as T from "../types"
 
 import { connect } from "react-redux"
@@ -34,7 +34,10 @@ export class AppComponent extends React.Component<Props, State> {
       .then(res => console.log("Logged in, uid: ", res.user.uid))
       .then(() => fs().doc("users/" + auth().currentUser.uid).get())
       .then(doc => this.props.setUser(doc.id, doc.data() as T.User))
-      .catch(err => console.log("Failed to sign in: ", err))
+      .catch(err => {
+        console.log("Failed to sign in: ", err)
+        Alert.alert("Something went wrong", err.message)
+      })
   }
 
   componentWillUnmount() {
