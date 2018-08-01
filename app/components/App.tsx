@@ -32,6 +32,7 @@ export class AppComponent extends React.Component<Props, State> {
     auth().onAuthStateChanged((user: any) => this.setState({ loggedIn: !!user }))
     auth().signInAnonymouslyAndRetrieveData()
       .then(res => console.log("Logged in, uid: ", res.user.uid))
+      .then(() => fs().doc("users/" + auth().currentUser.uid).set({ lastSignIn: new Date() }, { merge: true }))
       .then(() => fs().doc("users/" + auth().currentUser.uid).get())
       .then(doc => this.props.setUser(doc.id, doc.data() as T.User))
       .catch(err => {
